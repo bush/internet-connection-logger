@@ -5,4 +5,4 @@ services:
       context: .
       dockerfile: Dockerfile.x86_64
     volumes:
-     - .:/usr/src/app 
+     - ./src:/usr/src/app 
