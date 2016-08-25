@@ -1,0 +1,8 @@
+version: '2'
+services:
+  bg:
+    build:
+      context: .
+      dockerfile: Dockerfile.x86_64
+    volumes:
+     - .:/usr/src/app 
