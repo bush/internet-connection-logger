@@ -5,6 +5,8 @@ var rest = require("rest");
 var fs = require('fs');
 var scheduler = timr();
 var backlog = [];
+var dweetClient = require("node-dweetio");
+var dweetio = new dweetClient();
 
 try {
   var conf = JSON.parse(fs.readFileSync('./conf.json', 'utf8'));
@@ -43,6 +45,13 @@ function pushToAPI(stamp, status) {
         "Recieved a 400 error from the server. Check your thingspeak.com API key in conf.json";
       }
       console.log(stamp,status?'Online':'Offline',o.status);
+    });
+    
+    dweetio.dweet_for("10-ealing-internet-connection", {isOnline:status+0}, function(err, dweet){
+      console.log(dweet.thing); // "my-thing"
+      console.log(dweet.content); // The content of the dweet
+      console.log(dweet.created); // The create date of the dweet
+
     });
 }
 
