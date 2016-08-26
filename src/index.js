@@ -8,13 +8,15 @@ var backlog = [];
 
 try {
   var conf = JSON.parse(fs.readFileSync('./conf.json', 'utf8'));
-  const API_KEY = conf.apiKey;
+  //const API_KEY = conf.apiKey;
   const PING_INTERVAL = conf.checkFrequencySeconds;
   const PUSH_FREQ = conf.publishFrequencySeconds;
 } catch(e) {
   console.log("Please copy the file conf.json.default to conf.json. Place your thingspeak.com API key in the appropriate location within the file.");
   process.exit();
 }
+
+const API_KEY = process.env.THINGSPEAK_ICM_API_KEY || function() { console.log("Please defined the THINGSPEAK_ICM_API_KEY evnironmant variable"); process.exit(); } 
 
 console.log("Starting internet connection monitor.\nChecking every " + PING_INTERVAL + " seconds.\nUploading that data to thingspeak.com every " + PUSH_FREQ + " seconds.");
 

@@ -6,3 +6,5 @@ services:
       dockerfile: Dockerfile.x86_64
     volumes:
      - ./src:/usr/src/app 
+    environment:
+     - THINGSPEAK_ICM_API_KEY
