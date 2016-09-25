@@ -1,4 +1,6 @@
 var isOnline = require("is-online")
+var offline = 0;
+var powerSwitch = require("pi-pins").connect(22);
 var moment = require("moment-timezone");
 var timr = require("timr");
 var rest = require("rest");
@@ -8,11 +10,16 @@ var backlog = [];
 var dweetClient = require("node-dweetio");
 var dweetio = new dweetClient();
 
+// Initialize the powerSwitch 
+powerSwitch.mode('out');
+powerSwitch.value(false);
+
 try {
   var conf = JSON.parse(fs.readFileSync('./conf.json', 'utf8'));
   //const API_KEY = conf.apiKey;
   const PING_INTERVAL = conf.checkFrequencySeconds;
   const PUSH_FREQ = conf.publishFrequencySeconds;
+  const OFFLINE_MAX = conf.maxOfflineIntervals;
 } catch(e) {
   console.log("Please copy the file conf.json.default to conf.json. Place your thingspeak.com API key in the appropriate location within the file.");
   process.exit();
@@ -32,7 +39,29 @@ var ping = function() {isOnline(function(err, online) {
             pushToAPI(event.stamp, event.online);
         }
     }
+
+    // Count the number of consecutive intervals we're offline and
+    // cycle the power if we've been offline for too many consecutive
+    // intervals
+    if(!online) {
+      offline++;
+      if(offline > offlineMax) {
+        cyclePower(10000);
+      }
+    } else {
+      offline = 0;
+    }
+
 })};
+
+function cyclePower(cycletime) {
+  powerSwitch.value(true);
+  console.log('Power is now off');
+  setTimeout(function () {
+    powerSwitch.value(false);
+    console.log('Power is back on');
+  },cycletime);
+}
 
 function pushToAPI(stamp, status) {
     var api = URL
