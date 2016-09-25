@@ -76,12 +76,12 @@ function pushToAPI(stamp, status) {
       console.log(stamp,status?'Online':'Offline',o.status);
     });
     
-    dweetio.dweet_for("10-ealing-internet-connection", {isOnline:status+0}, function(err, dweet){
-      console.log(dweet.thing); // "my-thing"
-      console.log(dweet.content); // The content of the dweet
-      console.log(dweet.created); // The create date of the dweet
+      //dweetio.dweet_for("10-ealing-internet-connection", {isOnline:status+0}, function(err, dweet){
+      //console.log(dweet.thing); // "my-thing"
+      //console.log(dweet.content); // The content of the dweet
+      //console.log(dweet.created); // The create date of the dweet
 
-    });
+    //});
 }
 
 scheduler().every(PING_INTERVAL).seconds().run(ping);
