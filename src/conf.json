@@ -1,6 +1,6 @@
 {
 	"apiKey":"8L2M142NFDH2XU8X",
-	"checkFrequencySeconds":60,
-	"publishFrequencySeconds":60,
+	"checkFrequencySeconds":3,
+	"publishFrequencySeconds":3,
   "maxOfflineIntervals":5
 }

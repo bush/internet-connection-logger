@@ -9,7 +9,9 @@ var scheduler = timr();
 var backlog = [];
 var dweetClient = require("node-dweetio");
 var dweetio = new dweetClient();
+var log = require('simple-node-logger').createSimpleLogger('logger.log');
 
+log.info('Initializing');
 // Initialize the powerSwitch 
 powerSwitch.mode('out');
 powerSwitch.value(false);
@@ -45,7 +47,9 @@ var ping = function() {isOnline(function(err, online) {
     // intervals
     if(!online) {
       offline++;
+      log.info('Offline for ' + offline + ' consecutive intervals.');
       if(offline > offlineMax) {
+        log.info('Internet is down ... cycling power switch ...');
         cyclePower(10000);
       }
     } else {
@@ -56,10 +60,10 @@ var ping = function() {isOnline(function(err, online) {
 
 function cyclePower(cycletime) {
   powerSwitch.value(true);
-  console.log('Power is now off');
+  log.info('Power is now off');
   setTimeout(function () {
     powerSwitch.value(false);
-    console.log('Power is back on');
+    log.info('Power is back on');
   },cycletime);
 }
 
