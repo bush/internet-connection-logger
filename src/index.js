@@ -1,5 +1,6 @@
 var isOnline = require("is-online")
 var offline = 0;
+var restarting = false;
 var powerSwitch = require("pi-pins").connect(22);
 var moment = require("moment-timezone");
 var timr = require("timr");
@@ -22,6 +23,9 @@ try {
   const PING_INTERVAL = conf.checkFrequencySeconds;
   const PUSH_FREQ = conf.publishFrequencySeconds;
   const OFFLINE_MAX = conf.maxOfflineIntervals;
+  const RESTART_DURATION = conf.restartDurationSeconds * 1000;
+  const POWER_OFF_DURATION = conf.powerOffDurationSeconds * 1000;
+  log.info('POWER_OFF_DURATION: ' + POWER_OFF_DURATION + ', RESTART_DURATION: ' + RESTART_DURATION);
 } catch(e) {
   console.log("Please copy the file conf.json.default to conf.json. Place your thingspeak.com API key in the appropriate location within the file.");
   process.exit();
@@ -46,11 +50,16 @@ var ping = function() {isOnline(function(err, online) {
     // cycle the power if we've been offline for too many consecutive
     // intervals
     if(!online) {
-      offline++;
-      log.info('Offline for ' + offline + ' consecutive intervals.');
-      if(offline > offlineMax) {
-        log.info('Internet is down ... cycling power switch ...');
-        cyclePower(10000);
+      if(!restarting) {
+        offline++;
+        log.info('Offline for ' + offline + ' consecutive intervals.');
+        if(offline > OFFLINE_MAX) {
+          log.info('Internet is down ... cycling power switch ...');
+          offline = 0;
+          cyclePower(POWER_OFF_DURATION,RESTART_DURATION);
+        }
+      } else {
+        log.info('Waiting for network equipment to restart ...');
       }
     } else {
       offline = 0;
@@ -58,13 +67,20 @@ var ping = function() {isOnline(function(err, online) {
 
 })};
 
-function cyclePower(cycletime) {
+function cyclePower(powerOffDuration,restartDuration) {
+  restarting = true;
   powerSwitch.value(true);
   log.info('Power is now off');
+
+  // Bring the 
   setTimeout(function () {
     powerSwitch.value(false);
     log.info('Power is back on');
-  },cycletime);
+  },powerOffDuration);
+  setTimeout(function () {
+    restarting = false;
+    log.info('Network equipment should be back online.  Resuming to normal monitoring mode.');
+  },restartDuration);
 }
 
 function pushToAPI(stamp, status) {
