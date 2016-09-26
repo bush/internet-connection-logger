@@ -1,7 +1,7 @@
 {
 	"apiKey":"8L2M142NFDH2XU8X",
-	"checkFrequencySeconds":3,
-	"publishFrequencySeconds":3,
+	"checkFrequencySeconds":60,
+	"publishFrequencySeconds":60,
   "maxOfflineIntervals":5,
   "powerOffDurationSeconds":5,
   "restartDurationSeconds":300
